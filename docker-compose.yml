@@ -1,0 +1,58 @@
+# Credit to https://github.com/bitnami/bitnami-docker-moodle for images and compose base
+
+version: "3.6"
+services:
+  mariadb:
+    image: "docker.io/bitnami/mariadb:10.3-debian-10"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_USER=bn_moodle
+      - MARIADB_DATABASE=bitnami_moodle
+    volumes:
+      - "mariadb_data:/bitnami/mariadb"
+  moodle:
+    image: "docker.io/bitnami/moodle:3-debian-10"
+    environment:
+      - MOODLE_DATABASE_HOST=mariadb
+      - MOODLE_DATABASE_PORT_NUMBER=3306
+      - MOODLE_DATABASE_USER=bn_moodle
+      - MOODLE_DATABASE_NAME=bitnami_moodle
+      - ALLOW_EMPTY_PASSWORD=yes
+      - VIRTUAL_HOST=lms.phillip.page,localhost
+      - VIRTUAL_PORT=8080
+      - LETSENCRYPT_HOST=lms.phillip.page
+      - LETSENCRYPT_EMAIL=lms@phillip.page
+    volumes:
+      - "moodle_data:/bitnami/moodle"
+      - "moodledata_data:/bitnami/moodledata"
+    depends_on:
+      - mariadb
+  nginx-proxy:
+    restart: always
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - certs:/etc/nginx/certs:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+  letsencrypt:
+    restart: always
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    volumes:
+      - vhost:/etc/nginx/vhost.d:rw
+      - html:/usr/share/nginx/html:rw
+      - certs:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+
+volumes:
+  mariadb_data:
+  moodle_data:
+  moodledata_data:
+  vhost:
+  html:
+  certs:
