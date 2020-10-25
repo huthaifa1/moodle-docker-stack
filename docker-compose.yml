@@ -18,10 +18,10 @@ services:
       - MOODLE_DATABASE_USER=bn_moodle
       - MOODLE_DATABASE_NAME=bitnami_moodle
       - ALLOW_EMPTY_PASSWORD=yes
-      - VIRTUAL_HOST=lms.phillip.page,localhost
+      - VIRTUAL_HOST=lms-huzaifa.org,localhost
       - VIRTUAL_PORT=8080
-      - LETSENCRYPT_HOST=lms.phillip.page
-      - LETSENCRYPT_EMAIL=lms@phillip.page
+      - LETSENCRYPT_HOST=lms-huzaifa.org
+      - LETSENCRYPT_EMAIL=huthiafaalmustafa@gmail.com
     volumes:
       - "moodle_data:/bitnami/moodle"
       - "moodledata_data:/bitnami/moodledata"
